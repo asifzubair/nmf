@@ -48,7 +48,7 @@ if __name__ == "__main__":
     counts = load_df_from_npz(counts_file)
     input_counts = sc.AnnData(X=counts.values,
                               obs=pd.DataFrame(index=counts.index),
-                              var=pd.DataFrame(index=counts.columns)) 
+                              var=pd.DataFrame(index=counts.columns))
     tpm = nmh.compute_tpm(input_counts)
     norm_counts = nmh.get_norm_counts(input_counts, tpm, 
                                       num_highvar_genes=2000)
@@ -56,6 +56,6 @@ if __name__ == "__main__":
     print("Shape of input matrix: {}".format(norm_counts.X.shape))
 
     cv_out = run_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout)
-    save_cv_nmf(*cv_out, fname=os.path.join(path, "cv_output"))
+    save_cv_nmf(*cv_out, fname=os.path.join(path, f"cv_output_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
     
-    plot_cv_nmf(*cv_out, fig_name=save_fname)    
+    plot_cv_nmf(*cv_out, fig_name=save_fname)
