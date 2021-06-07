@@ -279,6 +279,32 @@ def run_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
         
     return ranks, rr, train_err, test_err
 
+
+from multiprocessing import Pool
+
+def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
+    replicates = replicates
+    ranks = np.arange(k0, k+1)
+    train_err, test_err, rr = [], [], []
+
+    ks = (k[0] for k in product(ranks, range(replicates)))
+    par_cv_nmf = lambda k: cv_pca(data=data, rank=k, p_holdout=p_holdout, nonneg=True)[2:]
+    
+    # fit models
+    with Pool(processes=16) as pool:
+        out = pool.map(par_cv_nmf, ks)
+
+    for (tr, te), rnk in zip(out, ks):
+        train_err.append(tr)
+        test_err.append(te)
+        rr.append(rnk)
+        
+    rr = np.array(rr)
+    train_err, test_err = np.array(train_err), np.array(test_err)
+        
+    return ranks, rr, train_err, test_err
+
+
 def save_cv_nmf(ranks, rr, train_err, test_err, fname):
     np.savez_compressed(fname, ranks=ranks, rr=rr, train_err=train_err, test_err=test_err)
 
