@@ -38,7 +38,7 @@ def get_args():
     args = parser.parse_args()
 
     if args.r and not os.path.splitext(args.path)[1].lower() == ".rds":
-        print("Please provide RDS file with flag 'r'.\nExiting ...")        
+        print("Please provide RDS file with flag 'r'.\nExiting ...")
         sys.exit(0)
     return args
 

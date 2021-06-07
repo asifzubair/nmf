@@ -291,7 +291,7 @@ def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
     ranks = np.arange(k0, k+1)
     train_err, test_err, rr = [], [], []
 
-    ks = (k[0] for k in product(ranks, range(replicates)))
+    ks = [k[0] for k in product(ranks, range(replicates))]
     
     # fit models
     with Pool(processes=16) as pool:
