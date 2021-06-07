@@ -56,6 +56,7 @@ if __name__ == "__main__":
     if use_r:
         counts = pyreadr.read_r(path)[None]
         path, _ = os.path.splitext(path)
+        rds_prefix = os.path.basename(path)
         path = os.path.dirname(path)
     else:
         counts_file = os.path.join(path, "counts.npz")
@@ -71,7 +72,11 @@ if __name__ == "__main__":
     print("Shape of input matrix: {}".format(norm_counts.X.shape))
     
     cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout)
-    save_cv_nmf(*cv_out, fname=os.path.join(path, f"cv_output_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
+    
+    if use_r:
+        save_cv_nmf(*cv_out, fname=os.path.join(path, f"{rds_prefix}_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
+    else:
+        save_cv_nmf(*cv_out, fname=os.path.join(path, f"cv_output_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
     
     plot_cv_nmf(*cv_out, fig_name=save_fname)
         
