@@ -281,6 +281,7 @@ def run_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
 
 
 from multiprocessing import Pool
+from functools import partial
 
 def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
     replicates = replicates
@@ -288,11 +289,14 @@ def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3):
     train_err, test_err, rr = [], [], []
 
     ks = (k[0] for k in product(ranks, range(replicates)))
-    par_cv_nmf = lambda k: cv_pca(data=data, rank=k, p_holdout=p_holdout, nonneg=True)[2:]
+#    par_cv_nmf = lambda k: cv_pca(data=data, rank=k, p_holdout=p_holdout, nonneg=True)[2:]
+    
+    def par_cv_nmf(rank=k, data=data, p_holdout=p_holdout):
+        return cv_pca(data=data, rank=k, p_holdout=p_holdout, nonneg=True)[2:]
     
     # fit models
     with Pool(processes=16) as pool:
-        out = pool.map(par_cv_nmf, ks)
+        out = pool.map(partial(par_cv_nmf, data=data, p_holdout=p_holdout), ks)
 
     for (tr, te), rnk in zip(out, ks):
         train_err.append(tr)
