@@ -35,6 +35,8 @@ def get_args():
                         help='number of replicates')
     parser.add_argument('--r', action='store_true', 
                         help='read from an RDS file')
+    parser.add_argument('--n', default=16, type=int,
+                        help='number of processors to use')
     args = parser.parse_args()
 
     if args.r and not os.path.splitext(args.path)[1].lower() == ".rds":
@@ -52,6 +54,7 @@ if __name__ == "__main__":
     pholdout = args.pholdout
     replicates = args.replicates
     use_r = args.r
+    nprocessors = args.n
             
     if use_r:
         counts = pyreadr.read_r(path)[None]
@@ -71,7 +74,7 @@ if __name__ == "__main__":
 
     print("Shape of input matrix: {}".format(norm_counts.X.shape))
     
-    cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout)
+    cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout, num_processors=nprocessors)
     
     if use_r:
         save_cv_nmf(*cv_out, fname=os.path.join(path, f"{rds_prefix}_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
