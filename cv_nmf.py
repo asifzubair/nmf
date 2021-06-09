@@ -88,7 +88,7 @@ def cv_pca(data, rank, M=None, p_holdout=0.3, nonneg=False):
         U = np.random.randn(data.shape[0], rank)
 
     # fit pca/nmf
-    for itr in range(50):
+    for itr in range(100):
         Vt = solver(U, data, M)
         U = solver(Vt.T, data.T, M.T).T
 
