@@ -23,7 +23,7 @@ def get_args():
     parser = ap.ArgumentParser(description= "Run CV NMF on simulated data")
     parser.add_argument('path', 
                         help='location of simulation directory')
-    parser.add_argument('--save', default='./nmf_cv_curve.pdf',
+    parser.add_argument('--save', default='./cv_nmf_curve.pdf',
                         help='save filename path')
     parser.add_argument('--pholdout', default=0.3, type=float, 
                         help='fraction of cells in test set')
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     save_fname = args.save
     k0 = args.k0
     k = args.k
-    pholdout = args.pholdout
+    p_holdout = args.pholdout
     replicates = args.replicates
     use_r = args.r
     nprocessors = args.n
@@ -74,12 +74,12 @@ if __name__ == "__main__":
 
     print("Shape of input matrix: {}".format(norm_counts.X.shape))
     
-    cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout, num_processors=nprocessors)
+    cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=p_holdout, num_processors=nprocessors)
     
     if use_r:
-        save_cv_nmf(*cv_out, fname=os.path.join(path, f"{rds_prefix}_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
+        save_cv_nmf(*cv_out, fname=os.path.join(path, f"{rds_prefix}_k0_{k0}_k_{k}_holdout_{p_holdout}_replicates_{replicates}"))
     else:
-        save_cv_nmf(*cv_out, fname=os.path.join(path, f"cv_output_k0_{k0}_k_{k}_holdout_{pholdout}_replicates_{replicates}"))
+        save_cv_nmf(*cv_out, fname=os.path.join(path, f"cv_output_k0_{k0}_k_{k}_holdout_{p_holdout}_replicates_{replicates}"))
     
     plot_cv_nmf(*cv_out, fig_name=save_fname)
         
