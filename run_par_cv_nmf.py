@@ -20,7 +20,7 @@ import pyreadr
 
 
 def get_args():
-    parser = ap.ArgumentParser(description= "Run CV NMF on simulated data")
+    parser = ap.ArgumentParser(description= "Run CV NMF on simulated splatter data")
     parser.add_argument('path', 
                         help='location of simulation directory')
     parser.add_argument('--r', action='store_true', 

@@ -312,7 +312,7 @@ def save_cv_nmf(ranks, rr, train_err, test_err, fname):
     np.savez_compressed(fname, ranks=ranks, rr=rr, train_err=train_err, test_err=test_err)
 
 
-def plot_cv_nmf(ranks, rr, train_err, test_err, fig_name):
+def plot_cv_nmf(ranks, rr, train_err, test_err, fig_name, truth = None):
     mean_train = [np.mean(train_err[rr==rnk]) for rnk in ranks]
     mean_test = [np.mean(test_err[rr==rnk]) for rnk in ranks]
     
@@ -325,7 +325,8 @@ def plot_cv_nmf(ranks, rr, train_err, test_err, fig_name):
     ax[0].set_xlabel('Number of factors')
     ax[1].set_xlabel('Number of factors')
     ax[0].set_title('NMF')
-#    ax[1].axvline(truth, color='k', dashes=[2,2])
+    if truth:
+        ax[1].axvline(truth, color='k', dashes=[2,2])
     ax[0].plot(rr, train_err, 'ob', alpha=.5, ms=3, mec=None)
     ax[1].plot(rr, test_err, 'or', alpha=.5, ms=3, mec=None)
     ax[0].spines['top'].set_visible(False)
