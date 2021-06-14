@@ -17,8 +17,8 @@ import numpy as np
 import os
 import argparse as ap
 
-from numpy.random import default_rng
-rng = default_rng()
+#from numpy.random import default_rng
+#rng = default_rng()
 
 from cv_nmf import run_par_cv_nmf, save_cv_nmf, plot_cv_nmf
 
@@ -58,19 +58,24 @@ if __name__ == '__main__':
     p_holdout = args.pholdout
     num_processors = args.n
     save_dir = args.save_dir
-    cv_save = f"Sims_k0_{k0}_k_{k1}_holdout_{p_holdout}_replicates_{replicates}_truth_{K}"    
+    cv_save = f"Sims_k0_{k0}_k_{k1}_holdout_{p_holdout}_replicates_{replicates}_truth_{K}"
     
     M = 6442
     N = 2000
+    noise = 0.8
 
-    A = rng.negative_binomial(10, 0.8, (M, K))
-    B = rng.negative_binomial(10, 0.8, (K, N))
-    E = rng.standard_exponential((M, N))
+#    A = rng.negative_binomial(10, 0.8, (M, K))
+#    B = rng.negative_binomial(10, 0.8, (K, N))
+#    E = rng.standard_exponential((M, N))
+    
+    A = np.random.rand(M, K)
+    B = np.random.rand(K, N)
+    E = np.random.rand(M, N)
 
     assert np.linalg.matrix_rank(A) == K
     assert np.linalg.matrix_rank(B) == K
 
-    C = (A @ B) + E
+    C = (A @ B) + noise*E
     rankC = np.linalg.matrix_rank(C) 
     assert rankC == min(M, N)
 
@@ -82,5 +87,4 @@ if __name__ == '__main__':
     
     save_fname = os.path.join(save_dir, cv_save + ".pdf")
     plot_cv_nmf(*cv_out, fig_name=save_fname, truth=K)
-    
-    
+   
