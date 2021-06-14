@@ -25,8 +25,8 @@ def get_args():
                         help='location of simulation directory')
     parser.add_argument('--r', action='store_true', 
                         help='read from an RDS file')
-    parser.add_argument('--save', default='./cv_nmf_curve.pdf',
-                        help='save filename path')
+    parser.add_argument('--n', default=16, type=int,
+                        help='number of processors to use')
     parser.add_argument('--pholdout', default=0.3, type=float, 
                         help='fraction of cells in test set')
     parser.add_argument('--k0', default=2, type=int,
@@ -35,8 +35,8 @@ def get_args():
                         help='upper bound for number of factors')
     parser.add_argument('--replicates', default=1, type=int, 
                         help='number of replicates')
-    parser.add_argument('--n', default=16, type=int,
-                        help='number of processors to use')
+    parser.add_argument('--save', default='./cv_nmf_curve.pdf',
+                        help='save filename path')
     args = parser.parse_args()
 
     if args.r and not os.path.splitext(args.path)[1].lower() == ".rds":

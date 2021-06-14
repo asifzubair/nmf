@@ -17,17 +17,17 @@ from cnmf import save_df_to_npz, load_df_from_npz
 import nmf_helpers as nmh
 
 
-counts_fn = "./data/cNMF_input/cnmf_input_GOSH.tsv"
+counts_fn = "./data/GOSH/cnmf_input_GOSH.tsv"
 counts = pd.read_table(counts_fn, index_col=0)
-save_df_to_npz(counts, './data/cNMF_input/cnmf_input_GOSH.npz')
+save_df_to_npz(counts, './data/GOSH/cnmf_input_GOSH.npz')
 
-counts = load_df_from_npz('./data/cNMF_input/cnmf_input_GOSH.npz')
+counts = load_df_from_npz('./data/GOSH/cnmf_input_GOSH.npz')
 input_counts = sc.AnnData(X=counts.values,
                           obs=pd.DataFrame(index=counts.index),
                           var=pd.DataFrame(index=counts.columns)) 
 tpm = nmh.compute_tpm(input_counts)
 
-highvargenesfn = "./data/cNMF_input/cNMF_GOSH.overdispersed_genes.txt"
+highvargenesfn = "./data/GOSH/cNMF_GOSH.overdispersed_genes.txt"
 highvargenes = open(highvargenesfn).read().rstrip().split('\n')
 
 norm_counts = nmh.get_norm_counts(input_counts, tpm, 
