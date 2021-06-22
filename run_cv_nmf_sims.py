@@ -12,10 +12,9 @@ We try to examine behaviour of the CV NMF algorithm as it is implemented.
 We will use a matrix of size (6442, 2000) to find the optimal value of K
 """
 
-import numpy as np
-
 import os
 import argparse as ap
+import numpy as np
 
 #from numpy.random import default_rng
 #rng = default_rng()
@@ -31,20 +30,26 @@ log.setLevel(logging.INFO)
 
 def get_args():
     parser = ap.ArgumentParser(description= "Run CV NMF on basic simulated data")
-    parser.add_argument('--n', default=16, type=int,
+    parser.add_argument('--c', default=16, type=int,
                         help='number of processors to use')
     parser.add_argument('--k', default=25, type=int,
-                        help='truth value for the simulation')
+                        help='truth value for the simulation [25]')
     parser.add_argument('--k0', default=5, type=int,
-                        help='lower bound for number of factors')
+                        help='lower bound for number of factors [5]')
     parser.add_argument('--k1', default=50, type=int,
-                        help='upper bound for number of factors')
+                        help='upper bound for number of factors [50]')
     parser.add_argument('--replicates', default=1, type=int, 
-                        help='number of replicates')
+                        help='number of replicates [1]')
     parser.add_argument('--pholdout', default=0.3, type=float, 
-                        help='fraction of cells in test set')
+                        help='fraction of cells in test set [0.3]')
     parser.add_argument('--save-dir', default='./sims',
-                        help='save filename path')
+                        help='save filename path [./sims]')
+    parser.add_argument('--m', default=6442, type=int,
+                        help='number of rows of input matrix [6442]')
+    parser.add_argument('--n', default=6442, type=int,
+                        help='number of columns of input matrix [2000]')
+    parser.add_argument('--noise', default=0.8, type=float,
+                        help='noise amplitude [0.8]')
     args = parser.parse_args()
     return args
 
@@ -56,13 +61,13 @@ if __name__ == '__main__':
     K = args.k
     replicates = args.replicates
     p_holdout = args.pholdout
-    num_processors = args.n
+    num_processors = args.c
     save_dir = args.save_dir
     cv_save = f"Sims_k0_{k0}_k_{k1}_holdout_{p_holdout}_replicates_{replicates}_truth_{K}"
     
-    M = 6442
-    N = 2000
-    noise = 0.8
+    M = args.m
+    N = args.n 
+    noise = args.noise
 
 #    A = rng.negative_binomial(10, 0.8, (M, K))
 #    B = rng.negative_binomial(10, 0.8, (K, N))
@@ -79,7 +84,7 @@ if __name__ == '__main__':
     rankC = np.linalg.matrix_rank(C) 
     assert rankC == min(M, N)
 
-    log.info(f"Input matrix is of size {C.shape} and of rank {rankC}, truth value is {K}")
+    log.info(f"Input matrix is of size {C.shape} and of rank {rankC}, truth value is {K}, noise amplitude is {noise}")
 
     os.mkdir(save_dir)
     cv_out = run_par_cv_nmf(C, k0=k0, k=k1, replicates=replicates, p_holdout=p_holdout, num_processors=num_processors) 

@@ -14,6 +14,7 @@ from nnls import nnlsm_blockpivot as nnlstsq
 import itertools
 from scipy.spatial.distance import cdist
 from tqdm.contrib.itertools import product
+import logging
 
 def censored_lstsq(A, B, M):
     """Solves least squares problem with missing data in B
@@ -45,6 +46,29 @@ def censored_lstsq(A, B, M):
         T[:,np.arange(r),np.arange(r)] += 1e-6
         return np.squeeze(np.linalg.solve(T, rhs), axis=-1).T
 
+def censored_lstsq_slow(A, B, M):
+    """Solves least squares problem subject to missing data.
+
+    Note: uses a for loop over the columns of B, leading to a
+    slower but more numerically stable algorithm
+
+    Args
+    ----
+    A (ndarray) : m x r matrix
+    B (ndarray) : m x n matrix
+    M (ndarray) : m x n binary matrix (zeros indicate missing values)
+
+    Returns
+    -------
+    X (ndarray) : r x n matrix that minimizes norm(M*(AX - B))
+    """
+
+    X = np.empty((A.shape[1], B.shape[1]))
+    for i in range(B.shape[1]):
+        m = M[:,i] # drop rows where mask is zero
+        X[:,i] = np.linalg.lstsq(A[m], B[m,i])[0]
+    return X
+
 def censored_nnlstsq(A, B, M):
     """Solves nonnegative least-squares problem with missing data in B
 
@@ -66,6 +90,29 @@ def censored_nnlstsq(A, B, M):
     for n in range(B.shape[1]):
         X[n] = nnlstsq(T[n], rhs[n], is_input_prod=True)[0].T
     return X.T
+
+def censored_nnlstsq_slow(A, B, M):
+    """Solves least squares problem subject to missing data.
+
+    Note: uses a for loop over the columns of B, leading to a
+    slower but more numerically stable algorithm
+
+    Args
+    ----
+    A (ndarray) : m x r matrix
+    B (ndarray) : m x n matrix
+    M (ndarray) : m x n binary matrix (zeros indicate missing values)
+
+    Returns
+    -------
+    X (ndarray) : r x n matrix that minimizes norm(M*(AX - B))
+    """
+
+    X = np.empty((A.shape[1], B.shape[1]))
+    for i in range(B.shape[1]):
+        m = M[:,i] # drop rows where mask is zero
+        X[:,i] = nnlstsq(A[m], B[m,i], is_input_prod=True)[0].T
+    return X
 
 def cv_pca(data, rank, M=None, p_holdout=0.3, nonneg=False):
     """Fit PCA or NMF while holding out a fraction of the dataset.
@@ -292,6 +339,8 @@ def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3, num_processors
     train_err, test_err, rr = [], [], []
 
     ks = [k[0] for k in product(ranks, range(replicates))]
+    
+    logging.info(f"starting computations on {num_processors} cores")
     
     # fit models
     with Pool(processes=num_processors) as pool:
