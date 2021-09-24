@@ -22,11 +22,13 @@ import numpy as np
 from cv_nmf import run_par_cv_nmf, save_cv_nmf, plot_cv_nmf
 
 import logging
-log = logging.getLogger()
+logging.basicConfig(level=logging.DEBUG)
 
-console = logging.StreamHandler()
-log.addHandler(console)
-log.setLevel(logging.INFO)
+#log = logging.getLogger()
+#
+#console = logging.StreamHandler()
+#log.addHandler(console)
+#log.setLevel(logging.INFO)
 
 def get_args():
     parser = ap.ArgumentParser(description= "Run CV NMF on basic simulated data")
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     rankC = np.linalg.matrix_rank(C) 
     assert rankC == min(M, N)
 
-    log.info(f"Input matrix is of size {C.shape} and of rank {rankC}, truth value is {K}, noise amplitude is {noise}")
+    logging.info(f"Input matrix is of size {C.shape} and of rank {rankC}, truth value is {K}, noise amplitude is {noise}")
 
     os.mkdir(save_dir)
     cv_out = run_par_cv_nmf(C, k0=k0, k=k1, replicates=replicates, p_holdout=p_holdout, num_processors=num_processors) 

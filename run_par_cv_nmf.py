@@ -18,6 +18,8 @@ import nmf_helpers as nmh
 from cv_nmf import run_par_cv_nmf, save_cv_nmf, plot_cv_nmf
 import pyreadr
 
+import logging
+logging.basicConfig(level = logging.DEBUG)
 
 def get_args():
     parser = ap.ArgumentParser(description= "Run CV NMF on simulated splatter data")
@@ -72,7 +74,7 @@ if __name__ == "__main__":
     norm_counts = nmh.get_norm_counts(input_counts, tpm, 
                                       num_highvar_genes=2000)
 
-    print("Shape of input matrix: {}".format(norm_counts.X.shape))
+    logging.debug("Shape of input matrix: {}".format(norm_counts.X.shape))
     
     cv_out = run_par_cv_nmf(norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=p_holdout, num_processors=nprocessors)
     

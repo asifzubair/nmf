@@ -340,7 +340,7 @@ def run_par_cv_nmf(data, replicates=1, k0=2, k=15, p_holdout=0.3, num_processors
 
     ks = [k[0] for k in product(ranks, range(replicates))]
     
-    logging.info(f"starting computations on {num_processors} cores")
+    logging.debug(f"starting computations on {num_processors} cores")
     
     # fit models
     with Pool(processes=num_processors) as pool:
