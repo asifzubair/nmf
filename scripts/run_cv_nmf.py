@@ -16,7 +16,10 @@ import scanpy as sc
 sys.path.append("../cNMF")
 import nmf.nmf_helpers as nmh
 from nmf.cv_nmf import plot_cv_nmf, run_cv_nmf, save_cv_nmf
+from nmf.log import configure_and_get_logger
 from nmf.nmf_helpers import load_df_from_npz
+
+logger = configure_and_get_logger()
 
 
 def get_args():
@@ -60,7 +63,7 @@ if __name__ == "__main__":
     tpm = nmh.compute_tpm(input_counts)
     norm_counts = nmh.get_norm_counts(input_counts, tpm, num_highvar_genes=2000)
 
-    print("Shape of input matrix: {}".format(norm_counts.X.shape))
+    logger.info("Shape of input matrix: {}".format(norm_counts.X.shape))
 
     cv_out = run_cv_nmf(
         norm_counts.X, k0=k0, k=k, replicates=replicates, p_holdout=pholdout
