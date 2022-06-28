@@ -9,12 +9,13 @@ Created on Wed Apr 28 11:08:09 2021
 """
 Code for nonnegative least squares by block-pivoting.
 """
+import time
+
 import numpy as np
-import scipy.optimize as opt
-import scipy.sparse as sps
 import numpy.linalg as nla
 import scipy.linalg as sla
-import time
+import scipy.optimize as opt
+import scipy.sparse as sps
 
 """
 The remaining code in this file was written and shared by Jingu Kim (@kimjingu).
@@ -51,13 +52,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+
 def nnlsm_blockpivot(A, B, is_input_prod=False, init=None):
-    """ Nonnegativity-constrained least squares with block principal pivoting method and column grouping
+    """Nonnegativity-constrained least squares with block principal pivoting method and column grouping
 
     Solves min ||AX-B||_2^2 s.t. X >= 0 element-wise.
 
     J. Kim and H. Park, Fast nonnegative matrix factorization: An active-set-like method and comparisons,
-    SIAM Journal on Scientific Computing, 
+    SIAM Journal on Scientific Computing,
     vol. 33, no. 6, pp. 3261-3281, 2011.
 
     Parameters
@@ -155,14 +157,14 @@ def nnlsm_blockpivot(A, B, is_input_prod=False, init=None):
             PassSet[false_set] = False
         if cols3.size > 0:
             for col in cols3:
-                candi_set = np.logical_or(
-                    not_opt_set[:, col], infea_set[:, col])
+                candi_set = np.logical_or(not_opt_set[:, col], infea_set[:, col])
                 to_change = np.max(candi_set.nonzero()[0])
                 PassSet[to_change, col] = ~PassSet[to_change, col]
                 num_backup += 1
 
         (X[:, not_opt_cols], temp_cholesky, temp_eq) = normal_eq_comb(
-            AtA, AtB[:, not_opt_cols], PassSet[:, not_opt_cols])
+            AtA, AtB[:, not_opt_cols], PassSet[:, not_opt_cols]
+        )
         num_cholesky += temp_cholesky
         num_eq += temp_eq
         X[abs(X) < 1e-12] = 0
@@ -170,10 +172,8 @@ def nnlsm_blockpivot(A, B, is_input_prod=False, init=None):
         Y[abs(Y) < 1e-12] = 0
 
         not_opt_mask = np.tile(not_opt_colset, (n, 1))
-        not_opt_set = np.logical_and(
-            np.logical_and(not_opt_mask, Y < 0), ~PassSet)
-        infea_set = np.logical_and(
-            np.logical_and(not_opt_mask, X < 0), PassSet)
+        not_opt_set = np.logical_and(np.logical_and(not_opt_mask, Y < 0), ~PassSet)
+        infea_set = np.logical_and(np.logical_and(not_opt_mask, X < 0), PassSet)
         not_good = np.sum(not_opt_set, axis=0) + np.sum(infea_set, axis=0)
         not_opt_colset = not_good > 0
         not_opt_cols = not_opt_colset.nonzero()[0]
@@ -182,7 +182,7 @@ def nnlsm_blockpivot(A, B, is_input_prod=False, init=None):
 
 
 def nnlsm_activeset(A, B, overwrite=False, is_input_prod=False, init=None):
-    """ Nonnegativity-constrained least squares with active-set method and column grouping
+    """Nonnegativity-constrained least squares with active-set method and column grouping
 
     Solves min ||AX-B||_2^2 s.t. X >= 0 element-wise.
 
@@ -256,7 +256,8 @@ def nnlsm_activeset(A, B, overwrite=False, is_input_prod=False, init=None):
             break
 
         (Z, temp_cholesky, temp_eq) = normal_eq_comb(
-            AtA, AtB[:, not_opt_cols], PassSet[:, not_opt_cols])
+            AtA, AtB[:, not_opt_cols], PassSet[:, not_opt_cols]
+        )
         num_cholesky += temp_cholesky
         num_eq += temp_eq
 
@@ -282,8 +283,9 @@ def nnlsm_activeset(A, B, overwrite=False, is_input_prod=False, init=None):
             min_ix = np.argmin(alpha, axis=0)
             min_vals = alpha[(min_ix, range(0, alpha.shape[1]))]
 
-            X[:, infea_cols] = X[:, infea_cols] + \
-                (Z[:, infea_subcols] - X[:, infea_cols]) * min_vals
+            X[:, infea_cols] = (
+                X[:, infea_cols] + (Z[:, infea_subcols] - X[:, infea_cols]) * min_vals
+            )
             X[(min_ix, infea_cols)] = 0
             PassSet[(min_ix, infea_cols)] = False
 
@@ -295,8 +297,7 @@ def nnlsm_activeset(A, B, overwrite=False, is_input_prod=False, init=None):
 
             Y[abs(Y) < 1e-12] = 0
 
-            not_opt_subset = np.logical_and(
-                Y[:, fea_cols] < 0, ~PassSet[:, fea_cols])
+            not_opt_subset = np.logical_and(Y[:, fea_cols] < 0, ~PassSet[:, fea_cols])
             new_opt_cols = fea_cols[np.all(~not_opt_subset, axis=0)]
             update_cols = fea_cols[np.any(not_opt_subset, axis=0)]
 
@@ -312,7 +313,7 @@ def nnlsm_activeset(A, B, overwrite=False, is_input_prod=False, init=None):
 
 
 def normal_eq_comb(AtA, AtB, PassSet=None):
-    """ Solve many systems of linear equations using combinatorial grouping.
+    """Solve many systems of linear equations using combinatorial grouping.
 
     M. H. Van Benthem and M. R. Keenan, J. Chemometrics 2004; 18: 441-450
 
@@ -372,7 +373,7 @@ def normal_eq_comb(AtA, AtB, PassSet=None):
 
 
 def _column_group_loop(B):
-    """ Given a binary matrix, find groups of the same columns
+    """Given a binary matrix, find groups of the same columns
         with a looping strategy
 
     Parameters
@@ -409,7 +410,7 @@ def _column_group_loop(B):
 
 
 def _column_group_recursive(B):
-    """ Given a binary matrix, find groups of the same columns
+    """Given a binary matrix, find groups of the same columns
         with a recursive strategy
 
     Parameters
