@@ -7,17 +7,17 @@ Created on Sun Apr 25 14:11:53 2021
 """
 
 import pandas as pd
-#import numpy as np
-#import scipy.sparse as sp
+# import numpy as np
+# import scipy.sparse as sp
 
-#from sklearn.utils import sparsefuncs
-#from sklearn.metrics import mean_squared_error
-#from sklearn.decomposition import non_negative_factorization
+# from sklearn.utils import sparsefuncs
+# from sklearn.metrics import mean_squared_error
+# from sklearn.decomposition import non_negative_factorization
 
 import scanpy as sc
 import nmf_helpers as nmh
 
-input_counts  = pd.read_csv("./simulated_example_data/filtered_counts.txt", sep = "\t", index_col=0)
+input_counts = pd.read_csv("./simulated_example_data/filtered_counts.txt", sep = "\t", index_col=0)
 
 """
 if sp.issparse(tpm.X):
@@ -33,7 +33,7 @@ input_tpm_stats = pd.DataFrame([gene_tpm_mean, gene_tpm_stddev],
 """
 
 umis = input_counts
-#if umis.dtype != np.int64:
+# if umis.dtype != np.int64:
 #    umis = umis.astype(np.int64)
 umis_X, Y = nmh.split_molecules(umis, 0.9)
 
