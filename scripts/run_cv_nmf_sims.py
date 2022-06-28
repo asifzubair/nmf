@@ -4,9 +4,7 @@
 Created on Fri Jun 11 14:48:08 2021
 
 @author: asif
-"""
 
-"""
 We try to examine behaviour of the CV NMF algorithm as it is implemented.
 
 We will use a matrix of size (6442, 2000) to find the optimal value of K
@@ -19,7 +17,7 @@ import numpy as np
 #from numpy.random import default_rng
 #rng = default_rng()
 
-from cv_nmf import run_par_cv_nmf, save_cv_nmf, plot_cv_nmf
+from nmf.cv_nmf import run_par_cv_nmf, save_cv_nmf, plot_cv_nmf
 
 import logging
 logging.basicConfig(level=logging.DEBUG)

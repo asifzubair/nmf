@@ -13,9 +13,9 @@ import scanpy as sc
 import pandas as pd
 
 sys.path.append("../cNMF")
-from cnmf import load_df_from_npz
-import nmf_helpers as nmh
-from cv_nmf import run_cv_nmf, save_cv_nmf, plot_cv_nmf
+from nmf.cnmf import load_df_from_npz
+import nmf.nmf_helpers as nmh
+from nmf.cv_nmf import run_cv_nmf, save_cv_nmf, plot_cv_nmf
 
 def get_args():
     parser = ap.ArgumentParser(description= "Run CV NMF on simulated data")
