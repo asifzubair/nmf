@@ -9,12 +9,13 @@ Created on Tue May 11 11:06:38 2021
 # from scipy.io import mmread
 # import scipy.sparse as sp
 import matplotlib.pyplot as plt
-import nmf_helpers as nmh
 
 # import os
 # import pandas as pd
 import numpy as np
 import scanpy as sc
+
+import nmf.nmf_helpers as nmh
 
 np.random.seed(14)
 
